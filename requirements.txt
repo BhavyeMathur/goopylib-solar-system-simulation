@@ -1,0 +1,2 @@
+goopylib~=2.0.0.dev1
+numpy~=1.26.3
