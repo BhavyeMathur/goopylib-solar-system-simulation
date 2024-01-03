@@ -1,8 +1,9 @@
 import goopylib as gp
 import numpy as np
 
+from . import mainloop
+
 __rings: list[gp.Circle] = []
-__frame = 0
 __window = None
 __N = 0
 
@@ -20,7 +21,7 @@ def __create_rings(radii):
 
 def __set_transparencies():
     for i, light in enumerate(__rings):
-        light.set_transparency((1 - i / __N) ** (8 + 2 * np.cos(__frame / 30)))
+        light.set_transparency((1 - i / __N) ** (8 + 2 * np.cos(mainloop.frame / 30)))
 
 
 def init(n, window):
@@ -34,8 +35,6 @@ def init(n, window):
 
 
 def shine():
-    global __frame
-    __frame += 1
     __set_transparencies()
 
 

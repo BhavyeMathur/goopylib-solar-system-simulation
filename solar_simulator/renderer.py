@@ -1,13 +1,13 @@
 import goopylib.imports as gp
 
 from .body import *
+from . import mainloop
 import math
 
 
 __planets: dict[Body, gp.Circle] = {}
 __trails: dict[Body, list[gp.Circle]] = {}
 
-__frame = 0
 __camera = None
 __scroll = 0
 __scale = 1e9
@@ -53,9 +53,6 @@ def get_planet_colors(color):
 
 
 def draw():
-    global __frame
-    __frame += 1
-
     for planet, graphic in __planets.items():
         if isinstance(planet, StationaryBody):
             # graphic.draw(graphic.window)
@@ -67,7 +64,7 @@ def draw():
         theta = math.atan2(*planet.pos)
         graphic.rotation = math.degrees(theta) + 30
 
-        if __frame % TRAIL_PERIOD == 0:
+        if mainloop.frame % TRAIL_PERIOD == 0:
             point = gp.Circle(planet.pos / __scale, 1).draw(graphic.window)
             point.set_color(gp.colors["whitesmoke"])
 
