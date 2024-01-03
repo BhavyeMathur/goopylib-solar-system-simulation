@@ -3,7 +3,7 @@ import math
 
 
 G = 6.67e-11
-DT = 100000
+DT = 10000
 
 
 def evolve():
@@ -29,7 +29,7 @@ def evolve():
         body.pos += body.vel * DT
 
 
-def time_dilate(mu):
+def calculate_dt(mu):
     global DT
 
     mu **= 3

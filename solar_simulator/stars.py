@@ -1,35 +1,40 @@
 import random
 
-import numpy as np
+import math
 import goopylib as gp
 
+from . import mainloop
 
-phases: np.array
-periods: np.array
-graphics: list[gp.Circle]
 
-__frame = 100
+class Star:
+    def __init__(self, window):
+        self.x = random.randint(-400, 400)
+        self.y = random.randint(-400, 400)
+
+        color = (random.randint(220, 255), random.randint(220, 255), random.randint(150, 255))
+        self.radius = random.random()
+
+        self.phase = 3.14159 * random.random()
+        self.period = (random.random() + 1) * (3.14159 / 75)
+
+        self.graphic = gp.Circle((self.x, self.y), self.radius)
+        self.graphic.set_color(color)
+        self.graphic.draw(window)
+
+        self.twinkle()
+
+    def twinkle(self):
+        self.graphic.set_transparency((math.cos(self.phase + mainloop.frame * self.period) + 1) / 5)
+
+
+stars: list[Star]
 
 
 def init(n, window):
-    global phases, periods, graphics
-
-    phases = np.pi * np.random.random(n)
-    periods = (np.random.random(n) + 1) * np.pi / 75
-
-    graphics = [gp.Circle((random.randint(-400, 400), random.randint(-400, 400)),
-                          random.random()) for _ in range(n)]
-    for star in graphics:
-        star.set_color((random.randint(220, 255), random.randint(220, 255), random.randint(150, 255)))
-        star.draw(window)
-
-    twinkle()
+    global stars
+    stars = [Star(window) for _ in range(n)]
 
 
 def twinkle():
-    global __frame
-    __frame += 1
-
-    alpha = (np.cos(phases + __frame * periods) + 1) / 5
-    for i, star in enumerate(graphics):
-        star.set_transparency(alpha[i])
+    for star in stars:
+        star.twinkle()

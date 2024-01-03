@@ -31,7 +31,7 @@ def move_through_space(_, scroll):
 
     planets.approach(scroll)
     sunlight.expand(planets.mu)
-    universe.time_dilate(planets.mu)
+    universe.calculate_dt(planets.mu)
 
     if abs(scroll) > 0.001:
         next_scroll = scroll - 0.00005 * np.sign(scroll)
