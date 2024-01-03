@@ -1,17 +1,14 @@
 from .vector import *
 
 
-DOWNSCALE_FACTOR = 1e0
-
-
 class Body:
     instances = []
 
     def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, color: str):
-        self.pos = Vector2D(*pos) / DOWNSCALE_FACTOR
-        self.vel = Vector2D(*vel) / DOWNSCALE_FACTOR
+        self.pos = Vector2D(*pos)
+        self.vel = Vector2D(*vel)
 
-        self.mass = mass / DOWNSCALE_FACTOR
+        self.mass = mass
 
         self.radius = radius
         self.color = color
