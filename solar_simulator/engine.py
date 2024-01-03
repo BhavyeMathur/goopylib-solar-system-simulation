@@ -1,4 +1,4 @@
-from body import *
+from .body import *
 import math
 
 

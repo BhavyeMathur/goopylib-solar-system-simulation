@@ -1,10 +1,6 @@
 import goopylib.imports as gp
+from solar_simulator import *
 import time
-
-import stars, sunlight
-import engine as universe
-import renderer as planets
-from body import *
 
 window = gp.Window(800, 800, "Solar System Simulation")
 gp.set_buffer_swap_interval(0)

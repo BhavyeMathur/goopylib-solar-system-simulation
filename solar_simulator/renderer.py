@@ -1,6 +1,6 @@
 import goopylib.imports as gp
 
-from body import *
+from .body import *
 import math
 
 

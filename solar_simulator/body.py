@@ -1,4 +1,4 @@
-from vector import *
+from .vector import *
 
 
 DOWNSCALE_FACTOR = 1e0
