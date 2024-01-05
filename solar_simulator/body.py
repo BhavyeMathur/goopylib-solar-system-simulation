@@ -5,16 +5,13 @@ from .vector import *
 
 
 TRAIL_LENGTH = 100
-TRAIL_PERIOD = 50
-
 SCALE = 1e9
-LAST_SCALE = SCALE
 
 
 class Body(gp.Renderable):
     instances = []
 
-    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, color: str):
+    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, color: str, trail_period: float):
         super().__init__()
         self._renderable = gp.Circle((0, 0), radius)
         self._renderable.set_color(*self.get_color(color))
@@ -22,6 +19,9 @@ class Body(gp.Renderable):
         self._pos = Vector2D(*pos)
         self._vel = Vector2D(*vel)
         self._pos_history = [self._pos]
+
+        self._trail_period = trail_period
+        self._last_trail_t = 0
 
         self._mass = mass
         self._radius = radius
@@ -57,12 +57,8 @@ class Body(gp.Renderable):
         theta = math.atan2(*self._pos)
         self.rotation = math.degrees(theta) + 30
 
-        n = 1 + (len(self._pos_history) - (TRAIL_PERIOD * TRAIL_LENGTH)) // TRAIL_PERIOD
-        if n > 0:
-            self._pos_history = self._pos_history[TRAIL_PERIOD * n:]
-
-        for point_idx, i in enumerate(range(0, len(self._pos_history), TRAIL_PERIOD)):
-            self._trail[point_idx].position = tuple(self._pos_history[i] / SCALE)
+        for i in range(0, min(len(self._pos_history), TRAIL_LENGTH)):
+            self._trail[i].position = tuple(self._pos_history[i] / SCALE)
 
     @staticmethod
     def draw_all(window):
@@ -80,7 +76,13 @@ class Body(gp.Renderable):
 
     @pos.setter
     def pos(self, value):
-        self._pos_history.append(Vector2D(*value))
+        if universe.T - self._last_trail_t > self._trail_period:
+            self._pos_history.append(Vector2D(*value))
+            self._last_trail_t = universe.T
+
+            if len(self._pos_history) > TRAIL_LENGTH:
+                self._pos_history.pop(0)
+
         self._pos = value
 
     @property
@@ -98,7 +100,7 @@ class Body(gp.Renderable):
 
 class StationaryBody(Body):
     def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, color: str):
-        super().__init__(pos=pos, vel=vel, mass=mass, radius=radius, color=color)
+        super().__init__(pos=pos, vel=vel, mass=mass, radius=radius, color=color, trail_period=0)
         self._renderable.set_color(color, gp.colors["white"], color, color)
 
     def update(self, frame):
@@ -108,3 +110,6 @@ class StationaryBody(Body):
 def rescale(mu):
     global SCALE
     SCALE = mu * 1.3e10 + (1 - mu) * 1e9
+
+
+from . import engine as universe

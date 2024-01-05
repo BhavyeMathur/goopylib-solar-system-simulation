@@ -3,10 +3,14 @@ import math
 
 
 G = 6.67e-11
-DT = 10000
+DT = 10000  # seconds
+T = 0  # hours
 
 
 def evolve():
+    global T
+    T += DT / 3600
+
     for body in Body.instances:
         if isinstance(body, StationaryBody):
             continue

@@ -41,10 +41,11 @@ def mainloop(stars=8000, sunlight_rings=20):
     window.scroll_callback = move_through_space
 
     # gp.Image(f"{PATH}/../assets/background.jpeg", (0, 0)).draw(window)
+    # gp.Image(f"{PATH}/../assets/Earth.png", (0, 0), 50, 50).draw(window)
 
-    Body.draw_all(window)
     _stars.init(stars, window)
     _sunlight.init(sunlight_rings, window)
+    Body.draw_all(window)
 
     gp.set_buffer_swap_interval(0)
     move_through_space(0, 0)
