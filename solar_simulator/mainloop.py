@@ -12,6 +12,7 @@ total_scroll = 0
 
 next_scroll = None
 window: gp.Window
+vignette: gp.Image
 
 
 def move_through_space(_, scroll):
@@ -19,7 +20,11 @@ def move_through_space(_, scroll):
 
     scroll = 1/30 * math.tanh(scroll)  # smoothing the scroll
     total_scroll = min(max(total_scroll + scroll, -4), 4)
-    window.get_camera().zoom = (3 * math.tanh(-total_scroll) + 11) / 8
+    zoom = (3 * math.tanh(-total_scroll) + 11) / 8
+    window.get_camera().zoom = zoom
+
+    vignette.height = 1000 / zoom  # TODO get camera frame coords
+    vignette.width = 1000 / zoom
 
     mu = (total_scroll + 4) / 8
 
@@ -34,7 +39,7 @@ def move_through_space(_, scroll):
 
 
 def mainloop(stars=8000, sunlight_rings=20):
-    global window, frame, last_refresh
+    global window, frame, last_refresh, vignette
 
     window = gp.Window(800, 800, "Solar System Simulation")
     window.background = gp.Color("#1d1826")
@@ -42,6 +47,8 @@ def mainloop(stars=8000, sunlight_rings=20):
 
     # gp.Image(f"{PATH}/../assets/background.jpeg", (0, 0)).draw(window)
     # gp.Image(f"{PATH}/../assets/Earth.png", (0, 0), 50, 50).draw(window)
+
+    vignette = gp.Image(f"{PATH}/../assets/vignette.png", (0, 0), 800, 800).draw(window)
 
     _stars.init(stars, window)
     _sunlight.init(sunlight_rings, window)
@@ -56,8 +63,8 @@ def mainloop(stars=8000, sunlight_rings=20):
 
         if time.time() - last_refresh > 0.02:
             _stars.twinkle()
-            Body.update_all(frame)
             _sunlight.shine()
+            Body.update_all(frame)
 
             frame += 1
             last_refresh = time.time()
