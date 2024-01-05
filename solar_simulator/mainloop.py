@@ -15,6 +15,10 @@ window: gp.Window
 vignette: gp.Image
 
 
+def get_scale_interpolation_factor():
+    return (total_scroll + 4) / 8
+
+
 def move_through_space(_, scroll):
     global next_scroll, total_scroll
 
@@ -26,7 +30,7 @@ def move_through_space(_, scroll):
     vignette.height = 1000 / zoom  # TODO get camera frame coords
     vignette.width = 1000 / zoom
 
-    mu = (total_scroll + 4) / 8
+    mu = get_scale_interpolation_factor()
 
     _bodies.rescale(mu)
     _sunlight.expand(mu)
@@ -46,7 +50,6 @@ def mainloop(stars=8000, sunlight_rings=20):
     window.scroll_callback = move_through_space
 
     # gp.Image(f"{PATH}/../assets/background.jpeg", (0, 0)).draw(window)
-    # gp.Image(f"{PATH}/../assets/Earth.png", (0, 0), 50, 50).draw(window)
 
     vignette = gp.Image(f"{PATH}/../assets/vignette.png", (0, 0), 800, 800).draw(window)
 
@@ -66,11 +69,19 @@ def mainloop(stars=8000, sunlight_rings=20):
             _sunlight.shine()
             Body.update_all(frame)
 
-            frame += 1
-            last_refresh = time.time()
-
             if next_scroll:
                 move_through_space(0, next_scroll)
+
+            if window.check_key(gp.KEY_UP):
+                _universe.DT_MULTIPLIER = min(_universe.DT_MULTIPLIER * 1.01, 20)
+                _universe.calculate_dt(get_scale_interpolation_factor())
+
+            elif window.check_key(gp.KEY_DOWN):
+                _universe.DT_MULTIPLIER = max(_universe.DT_MULTIPLIER / 1.01, 0.1)
+                _universe.calculate_dt(get_scale_interpolation_factor())
+
+            frame += 1
+            last_refresh = time.time()
 
     gp.terminate()
 
