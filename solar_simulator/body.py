@@ -5,7 +5,7 @@ from .vector import *
 
 
 TRAIL_LENGTH = 100
-TRAIL_PERIOD = 20
+TRAIL_PERIOD = 50
 
 SCALE = 1e9
 LAST_SCALE = SCALE
@@ -34,10 +34,10 @@ class Body(gp.Renderable):
             point.set_transparency(i / TRAIL_LENGTH)
 
     def draw(self, window):
-        super().draw(window)
-
         for point in self._trail:
-            point.draw(self.window)
+            point.draw(window)
+
+        super().draw(window)
 
     @staticmethod
     def get_color(color):
@@ -46,25 +46,23 @@ class Body(gp.Renderable):
         shadow.saturation += 0.3
 
         albedo = gp.ColorHSV(*gp.hex_to_hsv(color))
-        albedo.value = min(1.0, 0.3 + albedo.value)  # value should automatically be clamped, accept ints
+        albedo.value = min(1.0, 0.3 + albedo.value)  # TODO value should automatically be clamped, accept ints
         albedo.saturation -= 0.3
 
         return color, albedo, shadow, gp.colors["black"]
 
     def update(self, frame):
-        self.x = self._pos.x / SCALE
-        self.y = self._pos.y / SCALE
+        self.position = tuple(self._pos / SCALE)
 
         theta = math.atan2(*self._pos)
         self.rotation = math.degrees(theta) + 30
 
-        if len(self._pos_history) >= TRAIL_PERIOD * TRAIL_LENGTH:
-            self._pos_history = self._pos_history[-(TRAIL_PERIOD * TRAIL_LENGTH):]
+        n = 1 + (len(self._pos_history) - (TRAIL_PERIOD * TRAIL_LENGTH)) // TRAIL_PERIOD
+        if n > 0:
+            self._pos_history = self._pos_history[TRAIL_PERIOD * n:]
 
         for point_idx, i in enumerate(range(0, len(self._pos_history), TRAIL_PERIOD)):
-            self._trail[point_idx].position = tuple(self._pos_history[i])
-
-        self.draw(self.window)
+            self._trail[point_idx].position = tuple(self._pos_history[i] / SCALE)
 
     @staticmethod
     def draw_all(window):
@@ -82,7 +80,7 @@ class Body(gp.Renderable):
 
     @pos.setter
     def pos(self, value):
-        self._pos_history.append(value / SCALE)
+        self._pos_history.append(Vector2D(*value))
         self._pos = value
 
     @property
