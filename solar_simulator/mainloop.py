@@ -11,9 +11,9 @@ def move_through_space(_, scroll):
 
     scroll = max(-0.3, min(0.3, scroll))
 
-    _planets.approach(scroll)
-    _sunlight.expand(_planets.mu)
-    _universe.calculate_dt(_planets.mu)
+    _bodies.zoom(scroll)
+    _sunlight.expand(_bodies.mu)
+    _universe.calculate_dt(_bodies.mu)
 
     if abs(scroll) > 0.001:
         next_scroll = scroll - 0.00005 * (-1 if scroll < 0 else 1)
@@ -26,7 +26,7 @@ def mainloop(stars=8000, sunlight_rings=20):
     window.background = gp.Color("#1d1826")
     window.scroll_callback = move_through_space
 
-    _planets.init(window)
+    _bodies.init(window)
     _stars.init(stars, window)
     _sunlight.init(sunlight_rings, window)
 
@@ -48,7 +48,7 @@ def update():
     if time.time() - last_refresh > 0.02:
         _stars.twinkle()
         _sunlight.shine()
-        _planets.orbit()
+        _bodies.draw()
 
         if next_scroll:
             move_through_space(0, next_scroll)
@@ -60,4 +60,4 @@ def update():
 from . import stars as _stars
 from . import sunlight as _sunlight
 from . import engine as _universe
-from . import renderer as _planets
+from . import body as _bodies
