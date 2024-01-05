@@ -2,6 +2,10 @@ import goopylib.imports as gp
 import time
 import math
 
+import os
+
+PATH = os.path.dirname(os.path.realpath(__file__))
+
 frame = 0
 last_refresh = 0
 total_scroll = 0
@@ -36,6 +40,8 @@ def mainloop(stars=8000, sunlight_rings=20):
     window.background = gp.Color("#1d1826")
     window.scroll_callback = move_through_space
 
+    # gp.Image(f"{PATH}/../assets/background.jpeg", (0, 0)).draw(window)
+
     Body.draw_all(window)
     _stars.init(stars, window)
     _sunlight.init(sunlight_rings, window)
@@ -49,14 +55,14 @@ def mainloop(stars=8000, sunlight_rings=20):
 
         if time.time() - last_refresh > 0.02:
             _stars.twinkle()
+            Body.update_all(frame)
             _sunlight.shine()
-            Body.update_all()
-
-            if next_scroll:
-                move_through_space(0, next_scroll)
 
             frame += 1
             last_refresh = time.time()
+
+            if next_scroll:
+                move_through_space(0, next_scroll)
 
     gp.terminate()
 
