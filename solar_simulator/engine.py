@@ -4,6 +4,7 @@ import math
 
 G = 6.67e-11
 DT = 10000  # seconds
+DT_MULTIPLIER = 1
 T = 0  # hours
 
 
@@ -37,4 +38,4 @@ def calculate_dt(mu):
     global DT
 
     mu **= 3
-    DT = mu * 100000 + (1 - mu) * 5000
+    DT = min((mu * 100000 + (1 - mu) * 2500) * DT_MULTIPLIER, 100000)
