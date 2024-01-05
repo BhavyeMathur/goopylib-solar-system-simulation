@@ -1,6 +1,6 @@
 from solar_simulator import *
 
-sun = StationaryBody((1e9, 0), (0, 0), 1.989e30, 10, "#edda8e")
+sun = StationaryBody((1e9, 0), (0, 0), 1.989e30, 0, "#edda8e")
 mercury = Body((5.7909e10, 0), (0, 47.36e3), 0.33011e24, 3, "#bf8f58")
 venus = Body((108.209e9, 0), (0.0, 35.02e3), 4.8675e24, 5, "#bf8f58")
 earth = Body((149.596e9, 0), (0.0, 29.78e3), 5.9724e24, 5, "#588dbf")

@@ -13,14 +13,13 @@ window: gp.Window
 def move_through_space(_, scroll):
     global next_scroll, total_scroll
 
-    scroll = 1/30 * math.tanh(scroll)
+    scroll = 1/30 * math.tanh(scroll)  # smoothing the scroll
     total_scroll = min(max(total_scroll + scroll, -4), 4)
     window.get_camera().zoom = (3 * math.tanh(-total_scroll) + 11) / 8
 
-    _bodies.SCALE = max(min(_bodies.SCALE * 2 ** scroll, 1.3e10), 1e9)
-    mu = (_bodies.SCALE - 1e9) / (1.3e10 - 1e9)
+    mu = (total_scroll + 4) / 8
 
-    _bodies.zoom(mu)
+    _bodies.rescale(mu)
     _sunlight.expand(mu)
     _universe.calculate_dt(mu)
 
@@ -37,7 +36,7 @@ def mainloop(stars=8000, sunlight_rings=20):
     window.background = gp.Color("#1d1826")
     window.scroll_callback = move_through_space
 
-    _bodies.init(window)
+    Body.draw_all(window)
     _stars.init(stars, window)
     _sunlight.init(sunlight_rings, window)
 
@@ -51,7 +50,7 @@ def mainloop(stars=8000, sunlight_rings=20):
         if time.time() - last_refresh > 0.02:
             _stars.twinkle()
             _sunlight.shine()
-            _bodies.orbit()
+            Body.update_all()
 
             if next_scroll:
                 move_through_space(0, next_scroll)
@@ -65,4 +64,5 @@ def mainloop(stars=8000, sunlight_rings=20):
 from . import stars as _stars
 from . import sunlight as _sunlight
 from . import engine as _universe
+from .body import Body
 from . import body as _bodies

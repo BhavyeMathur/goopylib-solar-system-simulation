@@ -65,15 +65,30 @@ class Body(gp.Circle):
         #         trail.pop(0)
 
         self.draw(self.window)
-    
-    # def draw(self, window):
-        # if isinstance(body, StationaryBody):
-        #     color = gp.Color(planet.color)
-        #     graphic.set_color(color, gp.colors["white"], color, color)
-        # else:
-        #     graphic.set_color(*get_planet_colors(planet.color))
-        # 
-        #     graphic.draw(window)
+
+    def update_trail(self):
+        pass
+        # k = SCALE / LAST_SCALE
+        #
+        # for planet in __planets.keys():
+        #     if isinstance(planet, StationaryBody):
+        #         continue
+        #
+        #     for trail in __trails[planet]:
+        #         trail.x /= k
+        #         trail.y /= k
+        #
+        # LAST_SCALE = SCALE
+
+    @staticmethod
+    def draw_all(window):
+        for body in Body.instances:
+            body.draw(window)
+
+    @staticmethod
+    def update_all():
+        for body in Body.instances:
+            body.update()
 
 
 class StationaryBody(Body):
@@ -85,36 +100,11 @@ class StationaryBody(Body):
         return
 
 
-def init(window):
-    global CAMERA
-    CAMERA = window.get_camera()
+def rescale(mu):
+    global SCALE, TRAIL_PERIOD
 
-    for body in Body.instances:
-        body.draw(window)
-
-
-def orbit():
-    for body in Body.instances:
-        body.update()
-
-
-def _update_trails():
-    pass
-    # k = SCALE / LAST_SCALE
-    #
-    # for planet in __planets.keys():
-    #     if isinstance(planet, StationaryBody):
-    #         continue
-    #
-    #     for trail in __trails[planet]:
-    #         trail.x /= k
-    #         trail.y /= k
-    #
-    # LAST_SCALE = SCALE
-
-
-def zoom(mu):
-    global TRAIL_PERIOD
-
+    SCALE = mu * 1.3e10 + (1 - mu) * 1e9
     TRAIL_PERIOD = mu * 4 + (1 - mu) * 2
-    _update_trails()
+
+    for body in Body.instances:
+        body.update_trails()
