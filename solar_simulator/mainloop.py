@@ -11,7 +11,9 @@ last_refresh = 0
 total_scroll = 0
 
 next_scroll = None
+
 window: gp.Window
+camera: gp.Camera
 vignette: gp.Image
 
 
@@ -25,10 +27,9 @@ def move_through_space(_, scroll):
     scroll = 1/30 * math.tanh(scroll)  # smoothing the scroll
     total_scroll = min(max(total_scroll + scroll, -4), 4)
     zoom = (3 * math.tanh(-total_scroll) + 11) / 8
-    window.get_camera().zoom = zoom
 
-    vignette.height = 1000 / zoom  # TODO get camera frame coords
-    vignette.width = 1000 / zoom
+    camera.zoom = zoom
+    vignette.set_size(**camera.get_visible_size())
 
     mu = get_scale_interpolation_factor()
 
@@ -43,11 +44,13 @@ def move_through_space(_, scroll):
 
 
 def mainloop(stars=8000, sunlight_rings=20):
-    global window, frame, last_refresh, vignette
+    global window, camera, frame, last_refresh, vignette
 
     window = gp.Window(800, 800, "Solar System Simulation")
     window.background = gp.Color("#1d1826")
     window.scroll_callback = move_through_space
+
+    camera = window.get_camera()
 
     # gp.Image(f"{PATH}/../assets/background.jpeg", (0, 0)).draw(window)
 
