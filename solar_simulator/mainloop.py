@@ -60,7 +60,7 @@ def mainloop(nstars=8000, sunlight_rings=20):
     global window, camera, frame, last_refresh, vignette
 
     window = gp.Window(800, 800, "Solar System Simulation")
-    window.background = gp.Color("#1d1826")
+    window.background = gp.Color("#240140")
 
     window.scroll_callback = move_through_space
     window.set_key_callback(gp.KEY_UP, increase_dt)
@@ -68,8 +68,12 @@ def mainloop(nstars=8000, sunlight_rings=20):
 
     camera = window.get_camera()
 
-    gp.Image(f"{PATH}/../assets/background.jpeg", (0, 0)).draw(window)
+    background = gp.Image(f"{PATH}/../assets/background.jpeg", (0, 0), 800, 800).draw(window)
+    background.set_transparency(0.3)
+    background.z = -1
+
     vignette = gp.Image(f"{PATH}/../assets/vignette.png", (0, 0), 800, 800).draw(window)
+    vignette.set_transparency(0.9)
 
     stars.init(nstars, window)
     sunlight.init(sunlight_rings, window)
