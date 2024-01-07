@@ -37,6 +37,7 @@ class Body(gp.Renderable):
         for i, point in enumerate(self._trail):
             point.set_color(gp.colors["whitesmoke"])
             point.set_transparency(i / TRAIL_LENGTH)
+            point.z = -1
 
     def draw(self, window):
         for point in self._trail:
