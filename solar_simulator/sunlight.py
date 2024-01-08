@@ -4,8 +4,6 @@ import numpy as np
 from . import mainloop
 
 
-# TODO remove eventually
-
 __rings: list[gp.Circle] = []
 __window = None
 N = 0

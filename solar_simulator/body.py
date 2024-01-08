@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import goopylib.imports as gp
 import math
 import os
@@ -10,7 +12,9 @@ SCALE = 1e9
 
 
 class Body(gp.Renderable):
-    instances = []
+    instances: list[Body] = []
+
+    draw_closest = True
 
     def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str, trail_period: float):
         super().__init__()
@@ -20,6 +24,8 @@ class Body(gp.Renderable):
         else:
             self._renderable = gp.Circle((0, 0), radius)
             self._renderable.set_color(*self.get_color(graphic))
+
+        self._renderable.z = 1
 
         self._pos = Vector2D(*pos)
         self._vel = Vector2D(*vel)
@@ -31,13 +37,14 @@ class Body(gp.Renderable):
         self._mass = mass
         self._radius = radius
 
+        self._closest_line = gp.Line((0, 0), (0, 0))
+
         Body.instances.append(self)
 
         self._trail: list[gp.Circle] = [gp.Circle((0, 0), 1) for _ in range(TRAIL_LENGTH)]
         for i, point in enumerate(self._trail):
             point.set_color(gp.colors["whitesmoke"])
             point.set_transparency(i / TRAIL_LENGTH)
-            point.z = -1
 
     def draw(self, window):
         for point in self._trail:
@@ -66,10 +73,39 @@ class Body(gp.Renderable):
         for i in range(0, min(len(self._pos_history), TRAIL_LENGTH)):
             self._trail[i].position = tuple(self._pos_history[i] / SCALE)
 
+        if self._closest_line.is_drawn():
+            self._closest_line.destroy()
+
+        if Body.draw_closest:
+            if closest_body := self._find_closest_body():
+                self._closest_line = gp.Line(self.position, closest_body.position, 2)
+                self._closest_line.set_color(gp.colors["white"])
+                self._closest_line.set_transparency(0.3)  # TODO renderable set_vertex_position methods
+                self._closest_line.draw(self.window)
+
+    def _find_closest_body(self):
+        closest_dist = float("inf")
+        closest_body = None
+
+        for body in Body.instances:
+            if isinstance(body, StationaryBody) or body == self:
+                continue
+
+            if (dist := math.dist(self.position, body.position)) < closest_dist:
+                closest_dist = dist
+                closest_body = body
+
+        return closest_body
+
     @staticmethod
     def draw_all(window):
         for body in Body.instances:
             body.draw(window)
+
+    @staticmethod
+    def toggle_draw_closest(clicked):
+        if not clicked:
+            Body.draw_closest = not Body.draw_closest
 
     @staticmethod
     def update_all(frame):
