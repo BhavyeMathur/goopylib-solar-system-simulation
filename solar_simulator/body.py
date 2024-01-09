@@ -39,14 +39,14 @@ class Body(gp.Renderable):
 
         self._closest_line = gp.Line((0, 0), (1, 1), 1)
         self._closest_line.set_color(gp.colors["whitesmoke"])
-        self._closest_line.set_transparency(0.3)
+        self._closest_line.transparency = 0.3
 
         Body.instances.append(self)
 
         self._trail: list[gp.Circle] = [gp.Circle((0, 0), 1) for _ in range(TRAIL_LENGTH)]
         for i, point in enumerate(self._trail):
             point.set_color(gp.colors["whitesmoke"])
-            point.set_transparency(i / TRAIL_LENGTH)
+            point.transparency = i / TRAIL_LENGTH
 
     def draw(self, window):
         for point in self._trail:
@@ -54,6 +54,11 @@ class Body(gp.Renderable):
 
         self._closest_line.draw(window)
         super().draw(window)
+
+    @staticmethod
+    def draw_all(window):
+        for body in Body.instances:
+            body.draw(window)
 
     @staticmethod
     def get_color(color):
@@ -75,6 +80,11 @@ class Body(gp.Renderable):
 
         for i in range(0, min(len(self._pos_history), TRAIL_LENGTH)):
             self._trail[i].position = tuple(self._pos_history[i] / SCALE)
+
+    @staticmethod
+    def update_all(frame):
+        for body in Body.instances:
+            body.update(frame)
 
     def draw_closest_line(self):
         if closest := self._find_closest_body():
@@ -98,22 +108,12 @@ class Body(gp.Renderable):
         return closest_body, closest_dist
 
     @staticmethod
-    def draw_all(window):
-        for body in Body.instances:
-            body.draw(window)
-
-    @staticmethod
     def toggle_draw_closest(clicked):
         if not clicked:
             Body.draw_closest = not Body.draw_closest
 
         for body in Body.instances:
             body._closest_line.hide(not Body.draw_closest)
-
-    @staticmethod
-    def update_all(frame):
-        for body in Body.instances:
-            body.update(frame)
 
     @staticmethod
     def draw_closest_all():

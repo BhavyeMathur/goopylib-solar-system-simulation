@@ -22,7 +22,7 @@ def __create_rings(radii):
 
 def __set_transparencies():
     for i, light in enumerate(__rings):
-        light.set_transparency((1 - i / N) ** (8 + 2 * np.cos(mainloop.frame / 30)))
+        light.transparency = (1 - i / N) ** (8 + 2 * np.cos(mainloop.frame / 30))
 
 
 def init(n, window):
