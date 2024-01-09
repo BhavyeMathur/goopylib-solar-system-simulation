@@ -37,7 +37,9 @@ class Body(gp.Renderable):
         self._mass = mass
         self._radius = radius
 
-        self._closest_line = gp.Line((0, 0), (0, 0))
+        self._closest_line = gp.Line((0, 0), (1, 1), 1)
+        self._closest_line.set_color(gp.colors["whitesmoke"])
+        self._closest_line.set_transparency(0.3)
 
         Body.instances.append(self)
 
@@ -50,6 +52,7 @@ class Body(gp.Renderable):
         for point in self._trail:
             point.draw(window)
 
+        self._closest_line.draw(window)
         super().draw(window)
 
     @staticmethod
@@ -73,15 +76,12 @@ class Body(gp.Renderable):
         for i in range(0, min(len(self._pos_history), TRAIL_LENGTH)):
             self._trail[i].position = tuple(self._pos_history[i] / SCALE)
 
-        if self._closest_line.is_drawn():
-            self._closest_line.destroy()
+    def draw_closest_line(self):
+        if closest := self._find_closest_body():
+            closest_body, _ = closest
 
-        if Body.draw_closest:
-            if closest_body := self._find_closest_body():
-                self._closest_line = gp.Line(self.position, closest_body.position, 2)
-                self._closest_line.set_color(gp.colors["white"])
-                self._closest_line.set_transparency(0.3)  # TODO renderable set_vertex_position methods
-                self._closest_line.draw(self.window)
+            self._closest_line.p1 = self.position
+            self._closest_line.p2 = closest_body.position
 
     def _find_closest_body(self):
         closest_dist = float("inf")
@@ -95,7 +95,7 @@ class Body(gp.Renderable):
                 closest_dist = dist
                 closest_body = body
 
-        return closest_body
+        return closest_body, closest_dist
 
     @staticmethod
     def draw_all(window):
@@ -107,10 +107,23 @@ class Body(gp.Renderable):
         if not clicked:
             Body.draw_closest = not Body.draw_closest
 
+        for body in Body.instances:
+            body._closest_line.hide(not Body.draw_closest)
+
     @staticmethod
     def update_all(frame):
         for body in Body.instances:
             body.update(frame)
+
+    @staticmethod
+    def draw_closest_all():
+        if not Body.draw_closest:
+            return
+
+        for body in Body.instances:
+            if isinstance(body, StationaryBody):
+                continue
+            body.draw_closest_line()
     
     @property
     def pos(self):

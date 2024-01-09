@@ -83,7 +83,9 @@ def mainloop(nstars=5000, sunlight_rings=20):
         if time.time() - last_refresh > 0.03:
             stars.twinkle()
             sunlight.shine()
+
             Body.update_all(frame)
+            Body.draw_closest_all()
 
             frame += 1
             last_refresh = time.time()

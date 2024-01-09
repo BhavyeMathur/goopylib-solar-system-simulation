@@ -27,7 +27,7 @@ class Star:
         self.twinkle()
 
     def twinkle(self):
-        # TODO Custom shader support
+        # TODO custom shader support (not for v2.0)
         self.graphic.set_transparency((math.cos(self.phase + (mainloop.frame + 100) * self.period) + 1) / 4)
 
 
