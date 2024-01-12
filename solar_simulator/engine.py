@@ -3,7 +3,7 @@ import math
 
 
 G = 6.67e-11
-DT = 10000  # seconds
+DT = 100  # seconds
 DT_MULTIPLIER = 1
 T = 0  # hours
 

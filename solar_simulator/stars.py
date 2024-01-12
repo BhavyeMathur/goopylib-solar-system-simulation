@@ -14,7 +14,7 @@ class Star:
         self.radius = 1.1 * random.random()
 
         self.phase = 3.14159 * random.random()
-        self.period = (2 * random.random() + 1) * (3.14159 / 75)
+        self.period = (2 * random.random() + 1) * (3.14159 / 50)
 
         self.graphic = gp.Circle((self.x, self.y), self.radius)
         self.graphic.draw(window)
@@ -30,6 +30,9 @@ class Star:
         # TODO custom shader support (not for v2.0)
         self.graphic.transparency = (math.cos(self.phase + (mainloop.frame + 100) * self.period) + 1) / 4
 
+    def move_to(self, x, y):
+        self.graphic.position = (x + self.x, y + self.y)
+
 
 stars: list[Star]
 
@@ -42,3 +45,8 @@ def init(n, window):
 def twinkle():
     for star in stars:
         star.twinkle()
+
+
+def wheel_overhead(x, y):
+    for star in stars:
+        star.move_to(x, y)

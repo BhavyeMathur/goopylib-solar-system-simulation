@@ -16,7 +16,8 @@ class Body(gp.Renderable):
 
     draw_closest = True
 
-    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str, trail_period: float):
+    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str,
+                 trail_period: float, follow_dt: float, follow_zoom: float):
         super().__init__()
 
         if os.path.isfile(graphic):
@@ -26,20 +27,24 @@ class Body(gp.Renderable):
             self._renderable.set_color(*self.get_color(graphic))
 
         self._renderable.z = 1
+        self.bounding_box = gp.Rectangle((0, 0), (50, 50))  # TODO add bounding boxes
 
         self._pos = Vector2D(*pos)
-        self._vel = Vector2D(*vel)
-        self._pos_history = [self._pos]
+        self.vel = Vector2D(*vel)
+        self.pos_history = [self._pos]
 
-        self._trail_period = trail_period
-        self._last_trail_t = 0
+        self.trail_period = trail_period
+        self.last_trail_t = 0
 
-        self._mass = mass
-        self._radius = radius
+        self.mass = mass
+        self.radius = radius
 
-        self._closest_line = gp.Line((0, 0), (1, 1), 1)
-        self._closest_line.set_color(gp.colors["whitesmoke"])
-        self._closest_line.transparency = 0.3
+        self.follow_dt = follow_dt
+        self.follow_zoom = follow_zoom
+
+        self.closest_line = gp.Line((0, 0), (1, 1), 1)
+        self.closest_line.set_color(gp.colors["whitesmoke"])
+        self.closest_line.transparency = 0.3
 
         Body.instances.append(self)
 
@@ -52,7 +57,7 @@ class Body(gp.Renderable):
         for point in self._trail:
             point.draw(window)
 
-        self._closest_line.draw(window)
+        self.closest_line.draw(window)
         super().draw(window)
 
     @staticmethod
@@ -74,12 +79,13 @@ class Body(gp.Renderable):
 
     def update(self, frame):
         self.position = tuple(self._pos / SCALE)
+        self.bounding_box.position = self.position
 
         theta = math.atan2(*self._pos)
-        self.rotation = math.degrees(theta) + 30
+        self.rotation = math.degrees(theta)
 
-        for i in range(0, min(len(self._pos_history), TRAIL_LENGTH)):
-            self._trail[i].position = tuple(self._pos_history[i] / SCALE)
+        for i in range(0, min(len(self.pos_history), TRAIL_LENGTH)):
+            self._trail[i].position = tuple(self.pos_history[i] / SCALE)
 
     @staticmethod
     def update_all(frame):
@@ -90,8 +96,8 @@ class Body(gp.Renderable):
         if closest := self._find_closest_body():
             closest_body, _ = closest
 
-            self._closest_line.p1 = self.position
-            self._closest_line.p2 = closest_body.position
+            self.closest_line.p1 = self.position
+            self.closest_line.p2 = closest_body.position
 
     def _find_closest_body(self):
         closest_dist = float("inf")
@@ -113,7 +119,7 @@ class Body(gp.Renderable):
             Body.draw_closest = not Body.draw_closest
 
         for body in Body.instances:
-            body._closest_line.hide(not Body.draw_closest)
+            body.closest_line.hide(not Body.draw_closest)
 
     @staticmethod
     def draw_closest_all():
@@ -131,34 +137,30 @@ class Body(gp.Renderable):
 
     @pos.setter
     def pos(self, value):
-        if universe.T - self._last_trail_t > self._trail_period:
-            self._pos_history.append(Vector2D(*value))
-            self._last_trail_t = universe.T
+        if universe.T - self.last_trail_t > self.trail_period:
+            self.pos_history.append(Vector2D(*value))
+            self.last_trail_t = universe.T
 
-            if len(self._pos_history) > TRAIL_LENGTH:
-                self._pos_history.pop(0)
+            if len(self.pos_history) > TRAIL_LENGTH:
+                self.pos_history.pop(0)
 
         self._pos = value
 
-    @property
-    def vel(self):
-        return self._vel
-
-    @vel.setter
-    def vel(self, value):
-        self._vel = value
-
-    @property
-    def mass(self):
-        return self._mass
+    def contains(self, x: float, y: float) -> bool:
+        return self.bounding_box.contains(x, y)
 
 
 class StationaryBody(Body):
-    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str):
-        super().__init__(pos=pos, vel=vel, mass=mass, radius=radius, graphic=graphic, trail_period=0)
+    instances: list[StationaryBody] = []
+
+    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str,
+                 follow_dt: float, follow_zoom: float):
+        super().__init__(pos=pos, vel=vel, mass=mass, radius=radius, graphic=graphic,
+                         trail_period=0, follow_dt=follow_dt, follow_zoom=follow_zoom)
         if isinstance(self._renderable, gp.Circle):
-            self._renderable.set_color(graphic, gp.colors["white"], graphic, graphic)
+            self._renderable.transparency = 0
         self._trail.clear()
+        StationaryBody.instances.append(self)
 
     def update(self, frame):
         return
