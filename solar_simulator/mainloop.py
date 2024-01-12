@@ -48,9 +48,7 @@ def update_frame():
 
     stars.twinkle()
     sunlight.shine()
-
-    Body.update_all(frame)
-    Body.draw_closest_all()
+    planets.orbit()
 
     camera.update()
     stars.wheel_overhead(*camera.position)
@@ -69,13 +67,13 @@ def create_universe(nstars=5000, sunlight_rings=20):
 
     window.scroll_callback = scroll.on_mouse_scroll
     window.left_click_callback = update_follow_body
-    window.set_key_callback(gp.KEY_H, Body.toggle_draw_closest)
+    window.set_key_callback(gp.KEY_H, closest_planet.toggle_draw_closest)
     window.set_key_callback(gp.KEY_UP, increase_dt)
     window.set_key_callback(gp.KEY_DOWN, decrease_dt)
 
     stars.init(nstars)
     sunlight.init(sunlight_rings)
-    bodies.init()
+    planets.init()
 
     scroll.init(camera)
     scroll.process_scale(0)
@@ -92,4 +90,5 @@ from . import stars
 from . import sunlight
 from . import engine as universe
 from . import scroll
-from . import body as bodies
+from . import body as planets
+from . import closest_planet

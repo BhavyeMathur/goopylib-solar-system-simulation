@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import goopylib.imports as gp
 import math
-import os
+
 
 from .vector import *
 
@@ -13,8 +13,6 @@ SCALE = 1e9
 
 class Body(gp.Renderable):
     instances: list[Body] = []
-
-    draw_closest = True
 
     def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: None | str,
                  trail_period: float, follow_dt: float, follow_zoom: float):
@@ -40,9 +38,7 @@ class Body(gp.Renderable):
         self.follow_dt = follow_dt
         self.follow_zoom = follow_zoom
 
-        self.closest_line = gp.Line((0, 0), (1, 1), 1)
-        self.closest_line.set_color(gp.colors["whitesmoke"])
-        self.closest_line.transparency = 0.3
+        self.closest_line = ClosestLine(self)
 
         Body.instances.append(self)
 
@@ -81,49 +77,7 @@ class Body(gp.Renderable):
         for i in range(0, min(len(self.pos_history), TRAIL_LENGTH)):
             self._trail[i].position = tuple(self.pos_history[i] / SCALE)
 
-    @staticmethod
-    def update_all(frame):
-        for body in Body.instances:
-            body.update(frame)
-
-    def draw_closest_line(self):
-        if closest := self._find_closest_body():
-            closest_body, _ = closest
-
-            self.closest_line.p1 = self.position
-            self.closest_line.p2 = closest_body.position
-
-    def _find_closest_body(self):
-        closest_dist = float("inf")
-        closest_body = None
-
-        for body in Body.instances:
-            if isinstance(body, StationaryBody) or body == self:
-                continue
-
-            if (dist := math.dist(self.position, body.position)) < closest_dist:
-                closest_dist = dist
-                closest_body = body
-
-        return closest_body, closest_dist
-
-    @staticmethod
-    def toggle_draw_closest(clicked):
-        if not clicked:
-            Body.draw_closest = not Body.draw_closest
-
-        for body in Body.instances:
-            body.closest_line.hide(not Body.draw_closest)
-
-    @staticmethod
-    def draw_closest_all():
-        if not Body.draw_closest:
-            return
-
-        for body in Body.instances:
-            if isinstance(body, StationaryBody):
-                continue
-            body.draw_closest_line()
+        self.closest_line.update()
     
     @property
     def pos(self):
@@ -167,5 +121,11 @@ def rescale(mu):
     SCALE = mu * 1.3e10 + (1 - mu) * 1e9
 
 
+def orbit():
+    for body in Body.instances:
+        body.update(mainloop.frame)
+
+
 from . import engine as universe
 from . import mainloop
+from .closest_planet import ClosestLine

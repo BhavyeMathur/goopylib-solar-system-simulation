@@ -7,16 +7,7 @@ camera = None
 
 def init(cam):
     global camera
-
     camera = cam
-
-
-def scale_from_zoom(zoom):
-    return -math.atanh((8 * zoom - 11) / 3)
-
-
-def zoom_from_scale(s):
-    return (3 * math.tanh(-s) + 11) / 8
 
 
 def get_scale_interpolation_factor():
@@ -27,7 +18,7 @@ def process_scale(s):
     global scale
 
     scale = s
-    camera.zoom = zoom_from_scale(scale)
+    camera.zoom = (3 * math.tanh(-scale) + 11) / 8
 
     mu = get_scale_interpolation_factor()
     rescale_bodies(mu)
