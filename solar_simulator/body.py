@@ -7,7 +7,6 @@ import math
 from .vector import *
 
 
-TRAIL_LENGTH = 100
 SCALE = 1e9
 
 
@@ -27,10 +26,6 @@ class Body(gp.Renderable):
 
         self._pos = Vector2D(*pos)
         self.vel = Vector2D(*vel)
-        self.pos_history = [self._pos]
-
-        self.trail_period = trail_period
-        self.last_trail_t = 0
 
         self.mass = mass
         self.radius = radius
@@ -40,18 +35,15 @@ class Body(gp.Renderable):
 
         self.closest_line = ClosestLine(self)
 
+        self.trail = Trail(trail_period)
+        self.trail.add_position(self._pos)
+
         Body.instances.append(self)
 
-        self._trail: list[gp.Circle] = [gp.Circle((0, 0), 1) for _ in range(TRAIL_LENGTH)]
-        for i, point in enumerate(self._trail):
-            point.set_color(gp.colors["whitesmoke"])
-            point.transparency = i / TRAIL_LENGTH
-
     def draw(self, window):
-        for point in self._trail:
-            point.draw(window)
-
+        self.trail.draw(window)
         self.closest_line.draw(window)
+
         if isinstance(self._renderable, gp.Image):
             super().draw(window)
 
@@ -74,9 +66,7 @@ class Body(gp.Renderable):
         theta = math.atan2(*self._pos)
         self.rotation = math.degrees(theta)
 
-        for i in range(0, min(len(self.pos_history), TRAIL_LENGTH)):
-            self._trail[i].position = tuple(self.pos_history[i] / SCALE)
-
+        self.trail.update()
         self.closest_line.update()
     
     @property
@@ -85,13 +75,7 @@ class Body(gp.Renderable):
 
     @pos.setter
     def pos(self, value):
-        if universe.T - self.last_trail_t > self.trail_period:
-            self.pos_history.append(Vector2D(*value))
-            self.last_trail_t = universe.T
-
-            if len(self.pos_history) > TRAIL_LENGTH:
-                self.pos_history.pop(0)
-
+        self.trail.add_position(value)
         self._pos = value
 
     def contains(self, x: float, y: float) -> bool:
@@ -104,7 +88,7 @@ class StationaryBody(Body):
     def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str = None):
         super().__init__(pos=pos, vel=vel, mass=mass, radius=radius, graphic=None,
                          trail_period=0, follow_dt=0, follow_zoom=0)
-        self._trail.clear()
+        self.trail.clear()
         StationaryBody.instances.append(self)
 
     def update(self, frame):
@@ -126,6 +110,6 @@ def orbit():
         body.update(mainloop.frame)
 
 
-from . import engine as universe
 from . import mainloop
 from .closest_planet import ClosestLine
+from .trail import Trail
