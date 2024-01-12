@@ -26,7 +26,7 @@ class SolarSystemCamera(gp.Camera):
         
         self.travel_start_rotation = 0
         self.travel_start_position = (0, 0)
-        self.travel_start_zoom = 1
+        self.travel_start_scale = 1
         self.travel_start = 0
 
     @gp.Camera.position.setter
@@ -81,7 +81,8 @@ class SolarSystemCamera(gp.Camera):
         mu = (time.time() - self.travel_start) / TRAVEL_TIME
         mu = TRAVEL_EASE(min(mu, 1))
 
-        mainloop.process_scale(target_scale * mu + (1 - mu) * self.travel_start_zoom)
+        scroll.process_scale(target_scale * mu + (1 - mu) * self.travel_start_scale)
+
         self.rotation = target_rotation * mu + (1 - mu) * self.travel_start_rotation
         self.x = target_position[0] * mu + (1 - mu) * self.travel_start_position[0]
         self.y = target_position[1] * mu + (1 - mu) * self.travel_start_position[1]
@@ -91,7 +92,7 @@ class SolarSystemCamera(gp.Camera):
     def travel_to(self, other):
         self.travel_start_rotation = self.rotation
         self.travel_start_position = self.position
-        self.travel_start_zoom = mainloop.total_scroll  # TODO change
+        self.travel_start_scale = scroll.scale
         
         self.follow_body = other
         self.is_travelling = True
@@ -104,4 +105,4 @@ class SolarSystemCamera(gp.Camera):
             self.follow(self.follow_body)
 
 
-from . import mainloop
+from . import scroll

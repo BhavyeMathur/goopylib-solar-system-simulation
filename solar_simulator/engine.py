@@ -3,7 +3,7 @@ import math
 
 
 G = 6.67e-11
-DT = 100  # seconds
+DT = 10000  # seconds
 DT_MULTIPLIER = 1
 T = 0  # hours
 
@@ -34,8 +34,13 @@ def evolve():
         body.pos += body.vel * DT
 
 
-def calculate_dt(mu):
+def calculate_dt(mu, body):
     global DT
 
-    mu **= 3
-    DT = min((mu * 100000 + (1 - mu) * 2500) * DT_MULTIPLIER, 100000)
+    if body is None:
+        mu **= 3
+        DT = mu * 100000 + (1 - mu) * 2500
+    else:
+        DT = body.follow_dt
+
+    DT = min((DT_MULTIPLIER * DT, 100000))

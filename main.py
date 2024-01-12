@@ -1,4 +1,5 @@
 from solar_simulator import *
+import time
 
 
 sun = StationaryBody((1e9, 0), (0, 0), 1.989e30, 5)
@@ -29,11 +30,8 @@ neptune = Body((4495.060e9, 0.0), (0.0, 5.43e3), 102.413e24, 9.5, "assets/Neptun
 
 
 if __name__ == "__main__":
-    create_window()
-
-    stars.init(8000)
-    sunlight.init(20)
-    bodies.init()
+    create_universe(nstars=5000, sunlight_rings=20)
+    last_refresh = 0
 
     while universe_is_alive():
         gp.update()  # TODO disable window autoflush
@@ -41,5 +39,6 @@ if __name__ == "__main__":
 
         if time.time() - last_refresh > 0.03:
             update_frame()
+            last_refresh = time.time()
 
     gp.terminate()

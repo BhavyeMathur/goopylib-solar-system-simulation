@@ -16,6 +16,7 @@ def __create_rings(radii):
     for i in range(N):
         light = gp.Circle((0, 0), float(radii[i])).draw(mainloop.window)
         light.set_color(gp.Color("#edda8e"))
+        light.z = 1
         __rings.append(light)
 
 
@@ -37,7 +38,7 @@ def shine():
     __set_transparencies()
 
 
-def expand(mu):
+def rescale(mu):
     mu = max(mu, 0.001) ** 0.2
 
     radii = np.linspace(mu * 1 + (1 - mu) * 20,
