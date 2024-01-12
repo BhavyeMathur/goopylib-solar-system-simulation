@@ -16,17 +16,15 @@ class Body(gp.Renderable):
 
     draw_closest = True
 
-    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str,
+    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: None | str,
                  trail_period: float, follow_dt: float, follow_zoom: float):
         super().__init__()
 
-        if os.path.isfile(graphic):
-            self._renderable = gp.Image(graphic, (0, 0), 2 * radius, 2 * radius)
-        else:
+        if graphic is None:
             self._renderable = gp.Circle((0, 0), radius)
-            self._renderable.set_color(*self.get_color(graphic))
-
-        self._renderable.z = 1
+        else:
+            self._renderable = gp.Image(graphic, (0, 0), 2 * radius, 2 * radius)
+            self._renderable.z = 1
         self.bounding_box = gp.Rectangle((0, 0), (50, 50))  # TODO add bounding boxes
 
         self._pos = Vector2D(*pos)
@@ -58,12 +56,8 @@ class Body(gp.Renderable):
             point.draw(window)
 
         self.closest_line.draw(window)
-        super().draw(window)
-
-    @staticmethod
-    def draw_all(window):
-        for body in Body.instances:
-            body.draw(window)
+        if isinstance(self._renderable, gp.Image):
+            super().draw(window)
 
     @staticmethod
     def get_color(color):
@@ -153,17 +147,19 @@ class Body(gp.Renderable):
 class StationaryBody(Body):
     instances: list[StationaryBody] = []
 
-    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str,
-                 follow_dt: float, follow_zoom: float):
-        super().__init__(pos=pos, vel=vel, mass=mass, radius=radius, graphic=graphic,
-                         trail_period=0, follow_dt=follow_dt, follow_zoom=follow_zoom)
-        if isinstance(self._renderable, gp.Circle):
-            self._renderable.transparency = 0
+    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str = None):
+        super().__init__(pos=pos, vel=vel, mass=mass, radius=radius, graphic=None,
+                         trail_period=0, follow_dt=0, follow_zoom=0)
         self._trail.clear()
         StationaryBody.instances.append(self)
 
     def update(self, frame):
         return
+
+
+def init():
+    for body in Body.instances:
+        body.draw(mainloop.window)
 
 
 def rescale(mu):
@@ -172,3 +168,4 @@ def rescale(mu):
 
 
 from . import engine as universe
+from . import mainloop
