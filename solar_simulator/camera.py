@@ -53,7 +53,7 @@ class SolarSystemCamera(gp.Camera):
         rotation = self.vignette.rotation
         self.vignette.rotation = 0
         self.vignette.set_size(**self.get_visible_size())
-        self.vignette.rotation = rotation  # TODO image should not require rotation to 0 for this to work
+        self.vignette.rotation = rotation  # TODO image should not require rotation to 0 for this to work (v2.0.x)
         
     def follow(self, other):
         self.position = other.position

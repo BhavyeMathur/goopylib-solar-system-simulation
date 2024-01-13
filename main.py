@@ -39,7 +39,7 @@ if __name__ == "__main__":
     frame = 0
 
     while universe_is_alive():
-        gp.update()  # TODO disable window autoflush
+        gp.update()  # TODO disable window autoflush (v2.0.x)
         universe.evolve()
         frame += 1
 

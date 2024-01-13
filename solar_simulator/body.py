@@ -17,7 +17,7 @@ class Body(gp.Renderable):
         else:
             self._renderable = gp.Image(graphic, (0, 0), 2 * radius, 2 * radius)
 
-        self.bounding_box = gp.Rectangle((-25, -25), (25, 25))  # TODO add bounding boxes to goopylib
+        self.bounding_box = gp.Rectangle((-25, -25), (25, 25))  # TODO add bounding boxes to goopylib (not for v2.0)
 
         self.follow_dt = follow_dt
         self.follow_zoom = follow_zoom
