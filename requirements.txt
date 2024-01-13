@@ -1,2 +1,3 @@
-goopylib~=2.0.0.dev1
-numpy~=1.26.3
+goopylib>=2.0.0.dev1
+numpy>=1.26.3
+scipy>=1.11.4

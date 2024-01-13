@@ -74,6 +74,7 @@ def create_universe(nstars=5000, sunlight_rings=20):
     stars.init(nstars)
     sunlight.init(sunlight_rings)
     planets.init()
+    universe.init()
 
     scroll.init(camera)
     scroll.process_scale(0)

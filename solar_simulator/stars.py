@@ -14,7 +14,7 @@ class Star:
         self.radius = 1.1 * random.random()
 
         self.phase = 3.14159 * random.random()
-        self.period = (2 * random.random() + 1) * (3.14159 / 100)
+        self.period = (2 * random.random() + 1) * (3.14159 / 50)
 
         self.graphic = gp.Circle((self.x, self.y), self.radius)
         self.graphic.draw(window)

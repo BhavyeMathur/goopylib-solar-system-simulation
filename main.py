@@ -1,6 +1,6 @@
-from solar_simulator import *
 import time
 
+from solar_simulator import *
 
 sun = StationaryBody((1e9, 0), (0, 0), 1.989e30, 5)
 
@@ -12,6 +12,9 @@ venus = Body((108.209e9, 0), (0.0, 35.02e3), 4.8675e24, 5, "assets/Venus.png",
 
 earth = Body((149.596e9, 0), (0.0, 29.78e3), 5.9724e24, 6, "assets/Earth.png",
              trail_period=96, follow_dt=800, follow_zoom=-3.8)
+
+moon = Body((149.6e9, 0), (0.0, 1.02e3), 7.34767309e20, 2, "assets/Earth.png",
+            trail_period=96, follow_dt=800, follow_zoom=-3.8)
 
 mars = Body((227.923e9, 0), (0.0, 24.07e3), 0.64171e24, 4, "assets/Mars.png",
             trail_period=98.6, follow_dt=1000, follow_zoom=-3.5)
@@ -28,17 +31,22 @@ uranus = Body((2872.463e9, 0.0), (0.0, 6.80e3), 86.813e24, 9, "assets/Uranus.png
 neptune = Body((4495.060e9, 0.0), (0.0, 5.43e3), 102.413e24, 9.5, "assets/Neptune.png",
                trail_period=4000, follow_dt=30000, follow_zoom=3.14)
 
-
 if __name__ == "__main__":
     create_universe(nstars=5000, sunlight_rings=20)
     last_refresh = 0
 
+    start = time.time()
+    frame = 0
+
     while universe_is_alive():
         gp.update()  # TODO disable window autoflush
         universe.evolve()
+        frame += 1
 
         if time.time() - last_refresh > 0.03:
             update_frame()
             last_refresh = time.time()
+
+    print(frame / (time.time() - start))
 
     gp.terminate()
