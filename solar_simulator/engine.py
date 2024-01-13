@@ -40,6 +40,7 @@ def evolve():
 
     for i, body in enumerate(Body.instances):
         if isinstance(body, StationaryBody):
+            positions[i] = body.pos
             continue
         body.pos = positions[i].copy()
 

@@ -18,14 +18,12 @@ def update_follow_body(mouse_down):
 
     for body in Body.instances:
         if body.contains(*mouse_pos):
-            if isinstance(body, StationaryBody):
-                break
-            if camera.follow_body == body:
-                return
-
-            other = body
+            if not isinstance(body, StationaryBody):
+                other = body
             break
 
+    if camera.follow_body == other:
+        return
     camera.travel_to(other)
     universe.recalculate_dt()
 
