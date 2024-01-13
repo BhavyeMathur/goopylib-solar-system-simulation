@@ -44,17 +44,43 @@ def evolve():
     positions += DT * velocities
 
     for i, body in enumerate(Body.instances):
+        if isinstance(body, StationaryBody):
+            continue
         body.pos = positions[i].copy()
 
 
-def calculate_dt(mu, body):
+def recalculate_dt(mu=None):
     global DT, _DT_HOURS
 
-    if body is None:
+    mu = mu if mu else scroll.get_scale_interpolation_factor()
+
+    if mainloop.camera.follow_body is None:
         mu **= 3
         DT = mu * 100000 + (1 - mu) * 2500
     else:
-        DT = body.follow_dt
+        DT = mainloop.camera.follow_body.follow_dt
 
     DT = min((DT_MULTIPLIER * DT, 100000))
     _DT_HOURS = DT / 3600
+
+
+def increase_dt(state):
+    global DT_MULTIPLIER
+
+    if state == 0:
+        return
+    DT_MULTIPLIER = min(DT_MULTIPLIER * 1.1, 20)
+    recalculate_dt()
+
+
+def decrease_dt(state):
+    global DT_MULTIPLIER
+
+    if state == 0:
+        return
+    DT_MULTIPLIER = max(DT_MULTIPLIER / 1.1, 0.1)
+    recalculate_dt()
+
+
+from . import scroll
+from . import mainloop

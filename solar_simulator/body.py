@@ -97,3 +97,4 @@ def rescale(mu):
 from . import mainloop
 from .closest_planet import ClosestLine
 from .trail import Trail
+from . import scroll

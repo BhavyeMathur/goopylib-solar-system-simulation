@@ -4,24 +4,9 @@ import goopylib.imports as gp
 
 
 frame = 0
-total_scroll = 0
 
 window: gp.Window
 camera: SolarSystemCamera
-
-
-def increase_dt(state):
-    if state == 0:
-        return
-    universe.DT_MULTIPLIER = min(universe.DT_MULTIPLIER * 1.1, 20)
-    universe.calculate_dt(scroll.get_scale_interpolation_factor(), camera.follow_body)
-
-
-def decrease_dt(state):
-    if state == 0:
-        return
-    universe.DT_MULTIPLIER = max(universe.DT_MULTIPLIER / 1.1, 0.1)
-    universe.calculate_dt(scroll.get_scale_interpolation_factor(), camera.follow_body)
 
 
 def update_follow_body(mouse_down):
@@ -29,18 +14,20 @@ def update_follow_body(mouse_down):
         return
 
     mouse_pos = window.get_mouse_position()
+    other = None
+
     for body in Body.instances:
         if body.contains(*mouse_pos):
-            if (camera.follow_body == body) or isinstance(body, StationaryBody):
+            if isinstance(body, StationaryBody):
+                break
+            if camera.follow_body == body:
                 return
 
-            camera.travel_to(body)
-            universe.calculate_dt(scroll.get_scale_interpolation_factor(), camera.follow_body)
-            return
+            other = body
+            break
 
-    if camera.follow_body is not None:
-        camera.travel_to(None)
-        universe.calculate_dt(scroll.get_scale_interpolation_factor(), camera.follow_body)
+    camera.travel_to(other)
+    universe.recalculate_dt()
 
 
 def update_frame():
@@ -49,9 +36,9 @@ def update_frame():
     stars.twinkle()
     sunlight.shine()
     planets.orbit()
-
     camera.update()
-    if camera.is_travelling or camera.follow_body is not None:
+
+    if camera.follow_body is not None or camera.is_travelling:
         stars.wheel_overhead(*camera.position)
 
     frame += 1
@@ -69,8 +56,8 @@ def create_universe(nstars=5000, sunlight_rings=20):
     window.scroll_callback = scroll.on_mouse_scroll
     window.left_click_callback = update_follow_body
     window.set_key_callback(gp.KEY_H, closest_planet.toggle_draw_closest)
-    window.set_key_callback(gp.KEY_UP, increase_dt)
-    window.set_key_callback(gp.KEY_DOWN, decrease_dt)
+    window.set_key_callback(gp.KEY_UP, universe.increase_dt)
+    window.set_key_callback(gp.KEY_DOWN, universe.decrease_dt)
 
     stars.init(nstars)
     sunlight.init(sunlight_rings)
