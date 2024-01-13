@@ -39,7 +39,7 @@ def update_frame():
     camera.update()
 
     if camera.follow_body is not None or camera.is_travelling:
-        stars.wheel_overhead(*camera.position)
+        stars.wheel_overhead(camera.position)
 
     frame += 1
 
@@ -64,7 +64,6 @@ def create_universe(nstars=5000, sunlight_rings=20):
     planets.init()
     universe.init()
 
-    scroll.init(camera)
     scroll.process_scale(0)
 
 

@@ -4,24 +4,19 @@ import numpy as np
 from .body import *
 
 G = 6.67e-11
+
 DT = 10000  # seconds
+_DT_HOURS = DT / 3600
 DT_MULTIPLIER = 1
 T = 0  # hours
 
-_DT_HOURS = DT / 3600
-
-Fx: np.ndarray
-Fy: np.ndarray
 positions: np.ndarray
 velocities: np.ndarray
 Gm: np.ndarray
 
 
 def init():
-    global Fx, Fy, positions, velocities, Gm
-
-    Fx = np.array([[0 for other in Body.instances if other != body] for body in Body.instances])
-    Fy = Fx.copy()
+    global positions, velocities, Gm
 
     positions = np.array([body.pos for body in Body.instances])
     velocities = np.array([body.vel for body in Body.instances])
@@ -29,7 +24,7 @@ def init():
 
 
 def evolve():
-    global T, Fx, Fy, positions, velocities
+    global T, positions, velocities
     T += _DT_HOURS
 
     distance_matrix = pdist(positions)
@@ -52,10 +47,8 @@ def evolve():
 def recalculate_dt(mu=None):
     global DT, _DT_HOURS
 
-    mu = mu if mu else scroll.get_scale_interpolation_factor()
-
     if mainloop.camera.follow_body is None:
-        mu **= 3
+        mu = (mu if mu else scroll.get_scale_interpolation_factor()) ** 3
         DT = mu * 100000 + (1 - mu) * 2500
     else:
         DT = mainloop.camera.follow_body.follow_dt
@@ -64,20 +57,16 @@ def recalculate_dt(mu=None):
     _DT_HOURS = DT / 3600
 
 
-def increase_dt(state):
+def increase_dt(_):
     global DT_MULTIPLIER
 
-    if state == 0:
-        return
     DT_MULTIPLIER = min(DT_MULTIPLIER * 1.1, 20)
     recalculate_dt()
 
 
-def decrease_dt(state):
+def decrease_dt(_):
     global DT_MULTIPLIER
 
-    if state == 0:
-        return
     DT_MULTIPLIER = max(DT_MULTIPLIER / 1.1, 0.1)
     recalculate_dt()
 

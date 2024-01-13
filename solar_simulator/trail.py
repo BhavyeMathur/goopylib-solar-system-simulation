@@ -31,9 +31,6 @@ class Trail:
             if len(self.pos_history) > TRAIL_LENGTH:
                 self.pos_history.pop(0)
 
-    def clear(self):
-        self.trail.clear()
-
 
 from . import body
 from . import engine as universe

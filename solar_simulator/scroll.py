@@ -2,12 +2,6 @@ import math
 
 
 scale = 0
-camera = None
-
-
-def init(cam):
-    global camera
-    camera = cam
 
 
 def get_scale_interpolation_factor():
@@ -18,7 +12,7 @@ def process_scale(s):
     global scale
 
     scale = s
-    camera.zoom = (3 * math.tanh(-scale) + 11) / 8
+    mainloop.camera.zoom = (3 * math.tanh(-scale) + 11) / 8
 
     mu = get_scale_interpolation_factor()
     bodies.rescale(mu)
@@ -34,3 +28,4 @@ def on_mouse_scroll(_, ds):
 from . import body as bodies
 from . import sunlight
 from . import engine as universe
+from . import mainloop

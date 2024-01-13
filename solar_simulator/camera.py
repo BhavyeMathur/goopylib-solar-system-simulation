@@ -19,15 +19,9 @@ class SolarSystemCamera(gp.Camera):
 
         self.vignette = gp.Image("assets/vignette.png", (0, 0), 800, 800).draw(window)
         self.vignette.transparency = 0.99
-        self.vignette.z = 0
         
         self.follow_body: Body | None = None
         self.is_travelling = False
-        
-        self.travel_start_rotation = 0
-        self.travel_start_position = (0, 0)
-        self.travel_start_scale = 1
-        self.travel_start = 0
 
     @gp.Camera.position.setter
     def position(self, value) -> None:
@@ -84,6 +78,7 @@ class SolarSystemCamera(gp.Camera):
         scroll.process_scale(target_scale * mu + (1 - mu) * self.travel_start_scale)
 
         self.rotation = target_rotation * mu + (1 - mu) * self.travel_start_rotation
+        # TODO add goopylib interpolation functions
         self.x = target_position[0] * mu + (1 - mu) * self.travel_start_position[0]
         self.y = target_position[1] * mu + (1 - mu) * self.travel_start_position[1]
 
