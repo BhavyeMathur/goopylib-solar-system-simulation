@@ -1,6 +1,7 @@
-from .body import *
 from scipy.spatial.distance import pdist, squareform
+import numpy as np
 
+from .body import *
 
 G = 6.67e-11
 DT = 10000  # seconds
@@ -8,7 +9,6 @@ DT_MULTIPLIER = 1
 T = 0  # hours
 
 _DT_HOURS = DT / 3600
-
 
 Fx: np.ndarray
 Fy: np.ndarray
@@ -39,33 +39,12 @@ def evolve():
 
     sep = positions[np.newaxis, :] - positions[:, np.newaxis]
 
-    accelerations = np.einsum('ijk,ij->ik', sep,  Gm / distance_matrix)
+    accelerations = np.einsum('ijk,ij->ik', sep, Gm / distance_matrix)
     velocities += DT * accelerations
     positions += DT * velocities
 
-    # for i, body in enumerate(Body.instances):
-    #     body.pos = Vector2D(*positions[i])
-
-    # for body in Body.instances:
-    #     if isinstance(body, StationaryBody):
-    #         continue
-    #
-    #     ax = 0
-    #     ay = 0
-    #
-    #     for other in Body.instances:
-    #         if body == other:
-    #             continue
-    #
-    #         distance = max(abs(other.pos - body.pos), 1e-3)
-    #         theta = math.atan2(*(other.pos - body.pos))
-    #
-    #         a = G * other.mass / (distance ** 2)
-    #         ax += math.sin(theta) * a
-    #         ay += math.cos(theta) * a
-    #
-    #     body.vel += DT * Vector2D(ax, ay)
-    #     body.pos += DT * body.vel
+    for i, body in enumerate(Body.instances):
+        body.pos = positions[i].copy()
 
 
 def calculate_dt(mu, body):

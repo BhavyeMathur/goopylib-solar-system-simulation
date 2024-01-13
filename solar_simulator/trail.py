@@ -1,5 +1,4 @@
 import goopylib.imports as gp
-from .vector import *
 
 TRAIL_LENGTH = 100
 
@@ -26,7 +25,7 @@ class Trail:
 
     def add_position(self, value):
         if universe.T - self.last_trail_t > self.trail_period:
-            self.pos_history.append(Vector2D(*value))
+            self.pos_history.append(value)
             self.last_trail_t = universe.T
 
             if len(self.pos_history) > TRAIL_LENGTH:

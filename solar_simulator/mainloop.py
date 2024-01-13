@@ -51,7 +51,8 @@ def update_frame():
     planets.orbit()
 
     camera.update()
-    stars.wheel_overhead(*camera.position)
+    if camera.is_travelling or camera.follow_body is not None:
+        stars.wheel_overhead(*camera.position)
 
     frame += 1
 

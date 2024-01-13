@@ -4,16 +4,13 @@ import goopylib.imports as gp
 import math
 
 
-from .vector import *
-
-
 SCALE = 1e9
 
 
 class Body(gp.Renderable):
     instances: list[Body] = []
 
-    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: None | str,
+    def __init__(self, pos, vel, mass: float, radius: float, graphic: None | str,
                  trail_period: float, follow_dt: float, follow_zoom: float):
         if graphic is None:
             self._renderable = gp.Circle((0, 0), radius)
@@ -22,8 +19,8 @@ class Body(gp.Renderable):
             self._renderable.z = 1
         self.bounding_box = gp.Rectangle((0, 0), (50, 50))  # TODO add bounding boxes to goopylib
 
-        self._pos = Vector2D(*pos)
-        self.vel = Vector2D(*vel)
+        self._pos = pos
+        self.vel = vel
 
         self.mass = mass
         self.radius = radius
@@ -47,7 +44,6 @@ class Body(gp.Renderable):
             super().draw(window)
 
     def update(self, frame):
-        self.pos = Vector2D(*universe.positions[self.id])
         theta = math.atan2(*self._pos)
 
         self.position = tuple(self._pos / SCALE)
@@ -73,14 +69,14 @@ class Body(gp.Renderable):
 class StationaryBody(Body):
     instances: list[StationaryBody] = []
 
-    def __init__(self, pos: Vec2D, vel: Vec2D, mass: float, radius: float, graphic: str = None):
+    def __init__(self, pos, vel, mass: float, radius: float, graphic: str = None):
         super().__init__(pos=pos, vel=vel, mass=mass, radius=radius, graphic=graphic,
                          trail_period=0, follow_dt=0, follow_zoom=0)
         self.trail.clear()
         StationaryBody.instances.append(self)
 
     def update(self, frame):
-        self.position = tuple(self._pos / SCALE)
+        return
 
 
 def init():
@@ -101,4 +97,3 @@ def rescale(mu):
 from . import mainloop
 from .closest_planet import ClosestLine
 from .trail import Trail
-from . import engine as universe

@@ -17,7 +17,7 @@ class ClosestLine(gp.Line):
     def update(self):
         if closest_body := self._find_closest_body():
             self.p1 = self.planet.position
-            self.p2 = (closest_body.pos.x / body.SCALE, closest_body.pos.y / body.SCALE)
+            self.p2 = tuple(closest_body.pos / body.SCALE)
 
     def _find_closest_body(self):
         closest_dist = float("inf")
