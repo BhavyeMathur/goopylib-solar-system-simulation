@@ -13,4 +13,4 @@ pip install -r requirements.txt
 Then open `main.py` and run the code!
 
 
-![assets/img.png](assets/img.png)
+![assets/solar-system.gif](assets/solar-system.gif)
